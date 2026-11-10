@@ -26,5 +26,5 @@ Grocy works out of the box. Optional variables you may set later (Grocy reads an
 ## Notes
 
 - **Image upgrades**: the Dockerfile pins the image digest. To upgrade Grocy, bump the digest in the Dockerfile to a newer `linuxserver/grocy` tag, redeploy, then **visit `/` once** — Grocy runs its database migration there.
-- **Healthcheck** uses `/login`, which answers 200 without authentication; `/` intentionally redirects (it also triggers first-run DB migration).
+- **No Railway healthcheck by design**: Railway's health probe targets the service's `PORT` variable, but this image ignores the injected `PORT` — nginx listens on fixed port 80 internally (the domain is pinned to that port). With no `PORT` variable the probe could never reach the app, so the template ships without one; deployments go active when the container starts. For reference: `/login` answers 200 without authentication, while `/` redirects (and triggers the first-run DB migration on a fresh volume).
 - Railway injects `PORT` but this image does not use it: nginx listens on fixed port 80 internally, and the domain targets that port.
